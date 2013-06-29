@@ -8,6 +8,8 @@ You need no more care about:
 * cache responses
 * several same requests simultaniuosly
 
+This is great for downloading repeatable images like avatars!
+
 Example:
 
 ```

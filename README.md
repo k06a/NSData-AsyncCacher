@@ -23,6 +23,8 @@ Example:
            return;
         }
         
+        // cell may be nil if you scroll away
+        UITableViewCell * cell = [tableView cellForRowAtIndexPath:indexPath];
        	cell.imageView.image = [UIImage imageWithData:data];
     }];
     

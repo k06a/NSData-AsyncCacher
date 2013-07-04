@@ -10,6 +10,6 @@
 
 @interface NSData (AsyncCacher)
 
-+ (void)getDataWithContentsOfURL:(NSURL *)url toBlock:(void(^)(NSData * data, BOOL * retry))block;
++ (void)getDataFromURL:(NSURL *)url toBlock:(void(^)(NSData * data, BOOL * retry))block;
 
 @end

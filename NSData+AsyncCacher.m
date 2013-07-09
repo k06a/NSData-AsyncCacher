@@ -29,19 +29,22 @@
         [NSURLCache setSharedURLCache:URLCache];
     });
     
+    if ([cache objectForKey:url])
+    {
+        BOOL retry = NO;
+        block([cache objectForKey:url], &retry);
+        if (!retry)
+            return;
+    }
+    
     [mainQueue addOperationWithBlock:^{
-        if ([cache objectForKey:url])
+        NSMutableArray * blocks = blocksDict[url];
+        if (blocks == nil)
         {
-            BOOL retry = NO;
-            block([cache objectForKey:url], &retry);
-            if (!retry)
-                return;
+            blocks = [NSMutableArray array];
+            blocksDict[url] = blocks;
         }
         
-        if (blocksDict[url] == nil)
-            blocksDict[url] = [NSMutableArray array];
-        
-        NSMutableArray * blocks = blocksDict[url];
         [blocks addObject:(block ? (id)block : (id)[NSNull null])];
         if (blocks.count != 1)
             return;

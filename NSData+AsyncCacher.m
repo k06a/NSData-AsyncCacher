@@ -29,10 +29,11 @@
         [NSURLCache setSharedURLCache:URLCache];
     });
     
-    if ([cache objectForKey:url])
+    NSData * object = [cache objectForKey:url];
+    if (object)
     {
         BOOL retry = NO;
-        block([cache objectForKey:url], &retry);
+        block(object, &retry);
         if (!retry)
             return;
     }

@@ -7,18 +7,19 @@
 //
 
 #import "NSData+AsyncCacher.h"
+#import "./SAMCache/SAMCache/SAMCache.h"
 
 @implementation NSData (AsyncCacher)
 
 + (void)getDataFromURL:(NSURL *)url toBlock:(void(^)(NSData * data, BOOL * retry))block
 {
-    static NSCache * cache;
+    static SAMCache * cache;
     static NSOperationQueue * mainQueue;
     static NSOperationQueue * parallelQueue;
     static NSMutableDictionary * blocksDict;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        cache = [[NSCache alloc] init];
+        cache = [[SAMCache alloc] initWithName:@"AsyncCacher"];
         mainQueue = [[NSOperationQueue alloc] init];
         mainQueue.maxConcurrentOperationCount = 1;
         parallelQueue = [[NSOperationQueue alloc] init];
@@ -29,7 +30,7 @@
         [NSURLCache setSharedURLCache:URLCache];
     });
     
-    NSData * object = [cache objectForKey:url];
+    NSData * object = [cache objectForKey:url.absoluteString];
     if (object)
     {
         BOOL retry = NO;
@@ -58,7 +59,7 @@
             
             [mainQueue addOperationWithBlock:^{
                 if (data)
-                    [cache setObject:data forKey:url];
+                    [cache setObject:data forKey:url.absoluteString];
                 
                 for (id a in blocks)
                 {

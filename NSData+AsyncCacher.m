@@ -30,6 +30,9 @@
         [NSURLCache setSharedURLCache:URLCache];
     });
     
+    if (url == nil && block == nil)
+        return [cache unloadAllObjects];
+    
     NSData * object = [cache objectForKey:url.absoluteString];
     if (object)
     {

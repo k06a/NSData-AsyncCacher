@@ -33,6 +33,9 @@
     if (url == nil && block == nil)
         return [cache unloadAllObjects];
     
+    if (url == nil)
+        return;
+    
     NSData * object = [cache objectForKey:url.absoluteString];
     if (object)
     {

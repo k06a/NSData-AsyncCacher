@@ -11,7 +11,15 @@
 
 @implementation NSData (AsyncCacher)
 
-+ (void)getDataFromURL:(NSURL *)url toBlock:(void(^)(NSData * data, BOOL * retry))block
++ (void)getDataFromURL:(NSURL *)url
+               toBlock:(void(^)(NSData * data, BOOL * retry))block
+{
+    return [NSData getDataFromURL:url toBlock:block needCache:YES];
+}
+
++ (void)getDataFromURL:(NSURL *)url
+               toBlock:(void(^)(NSData * data, BOOL * retry))block
+             needCache:(BOOL)needCache
 {
     static SAMCache * cache;
     static NSOperationQueue * mainQueue;
@@ -37,7 +45,7 @@
         return;
     
     NSData * object = [cache objectForKey:url.absoluteString];
-    if (object)
+    if (needCache && object)
     {
         BOOL retry = NO;
         block(object, &retry);
@@ -64,7 +72,7 @@
             NSData * data = [NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:url] returningResponse:&response error:&error];
             
             [mainQueue addOperationWithBlock:^{
-                if (data)
+                if (data && needCache)
                     [cache setObject:data forKey:url.absoluteString];
                 
                 for (id a in blocks)
@@ -77,7 +85,7 @@
                         BOOL retry = NO;
                         aBlock(data, &retry);
                         if (retry)
-                            [NSData getDataFromURL:url toBlock:aBlock];
+                            [NSData getDataFromURL:url toBlock:aBlock needCache:needCache];
                     });
                 }
                 [blocks removeAllObjects];

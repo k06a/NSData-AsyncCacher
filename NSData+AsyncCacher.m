@@ -61,17 +61,14 @@
             blocksDict[url] = blocks;
         }
         
-        [blocks addObject:(block ? (id)block : (id)[NSNull null])];
+        [blocks addObject:((id)block ?: (id)[NSNull null])];
         if (blocks.count != 1)
             return;
         
         [parallelQueue addOperationWithBlock:^
         {
-            NSError * error;
-            NSURLResponse * response;
-            NSData * data = [NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:url] returningResponse:&response error:&error];
-            
-            [mainQueue addOperationWithBlock:^{
+            [NSURLConnection sendAsynchronousRequest:[NSURLRequest requestWithURL:url] queue:mainQueue completionHandler:^(NSURLResponse *response, NSData *data, NSError *connectionError)
+            {
                 if (data && needCache)
                     [cache setObject:data forKey:url.absoluteString];
                 
